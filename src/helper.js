@@ -1,25 +1,46 @@
 var cardSuitNames = ["clubs", "diamonds", "hearts", "spades"];
 
 export function calculateWinner(squares) {
-    let names = ["tie", "first", "second"];
-    if (!squares || !squares[0] || !squares[1] || !squares[3] || !squares[4]) {
-        return null;
-    }
+    let names = ["tie", "dealer", "player"];
+    
+    let dealer = getDealerScore(squares);
+    let player = getPlayerScore(squares);
 
-    let firstPlayer = (extractNumber(squares[0]) + extractNumber(squares[1])) % 10;
-    let secondPlayer = (extractNumber(squares[3]) + extractNumber(squares[4])) % 10;
-    let winner = findWinner(firstPlayer, secondPlayer);
-
-    if (winner === 0) {
-        if (!squares[2] || !squares[5]) {
-            return null;
-        }
-        firstPlayer = (firstPlayer + extractNumber(squares[2])) % 10;
-        secondPlayer = (secondPlayer + extractNumber(squares[5])) % 10;
-        winner = findWinner(firstPlayer, secondPlayer);
-    }
+    let winner = findWinner(dealer, player);
+    console.log("Dealer Score is "+dealer);
+    console.log("Player Score is "+player);
     return names[winner];
 }
+
+export function getDealerScore(squares){
+    return (extractNumber(squares[0]) + extractNumber(squares[1])+ extractNumber(squares[2])) % 10;
+}
+
+export function getPlayerScore(squares){
+    return (extractNumber(squares[3]) + extractNumber(squares[4])+ extractNumber(squares[5])) % 10;
+}
+
+export function canDrawOneMoreCard(squares, dealer, player){
+    const NONE = "none";
+    let turn;
+
+    if (squares && squares[0] && squares[1] && squares[3] && squares[4] && squares[2] && squares[5]) {
+        turn= NONE;
+    } else if(dealer>=8 || player>=8){
+        turn= NONE;
+    } else if(player <=5 && !(squares[3] && squares[4] && squares[5])){
+        turn= "player";
+    } else if(dealer<=5 && !(squares[0] && squares[1] && squares[2])){
+        turn= "dealer";
+    }else{
+        turn = NONE;
+    }
+    console.log("Next turn is "+turn);
+    return turn;
+}
+
+
+
 export function getScore(card) {
     let sum = 0
     sum = extractNumber(card);
@@ -27,14 +48,17 @@ export function getScore(card) {
 }
 
 function extractNumber(card) {
+    if(!card){
+        return 0;
+    }
     const number = parseInt(card.split(":")[0], 10);
     return number > 10 ? 0 : number;
 }
 
-function findWinner(firstPlayer, secondPlayer) {
-    if (firstPlayer > secondPlayer) {
+function findWinner(dealerScore, playerScore) {
+    if (dealerScore > playerScore) {
         return 1;
-    } else if (firstPlayer < secondPlayer) {
+    } else if (dealerScore < playerScore) {
         return 2;
     } else {
         return 0;
@@ -45,7 +69,6 @@ export function pickCard() {
     let cardNumber = generateRandomNumber(13);
     let cardSuit = generateRandomNumber(4) - 1;
     let value = cardNumber.toString() + ":" + cardSuit.toString();
-    console.log("Card Generated Is " + value);
     return value;
 }
 

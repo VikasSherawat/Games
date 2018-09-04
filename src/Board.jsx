@@ -4,6 +4,7 @@ import { computeImageName } from './helper';
 import { calculateWinner } from './helper';
 import { pickCard } from './helper';
 import { getScore } from './helper';
+import { canDrawOneMoreCard } from './helper';
 import Score from './Score';
 
 class Board extends React.Component {
@@ -11,8 +12,8 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(6).fill(null),
-            dealer:0,
-            banker:0,
+            dealer: 0,
+            player: 0,
         };
 
         this.reset = this.reset.bind(this);
@@ -21,8 +22,8 @@ class Board extends React.Component {
     reset() {
         this.setState({
             squares: Array(6).fill(null),
-            dealer:0,
-            banker:0,
+            dealer: 0,
+            player: 0,
         })
     }
 
@@ -43,36 +44,58 @@ class Board extends React.Component {
 
     handleClick(index) {
         const squares = this.state.squares.slice();
-        if (calculateWinner(squares) || squares[index]) {
+        let turn;
+        
+        if (squares[index]) {
             return;
         }
 
-        let card = pickCard();
-        let dealerScore=this.state.dealer;
-        let bankerScore=this.state.banker;
-        if(index<3){
-            dealerScore += getScore(card);
-            dealerScore = dealerScore > 9 ? dealerScore % 10 : dealerScore
-        }else{
-            bankerScore += getScore(card);
-            bankerScore = bankerScore > 9 ? bankerScore % 10 : bankerScore
+        if (squares && squares[0] && squares[1] && squares[3] && squares[4]) {
+            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);    
         }
+        if(turn==="none"){
+            return;
+        }
+        if((index >2 && turn==="dealer")||(index <3 && turn==="player")){
+            return
+        }
+
+        let card = pickCard();
+        let {
+            dealer,
+            player
+        } = this.state;
+
+        if (index < 3) {
+            dealer += getScore(card);
+            dealer = dealer > 9 ? dealer % 10 : dealer
+        } else {
+            player += getScore(card);
+            player = player > 9 ? player % 10 : player
+        }
+
         squares[index] = card;
         this.setState({
-            squares: squares,
-            dealer:dealerScore,
-            banker:bankerScore,  
-        })
+            squares,
+            dealer,
+            player,
+        });
     }
 
     render() {
-        let status = "Bacarrat Game:";
-        const winner = calculateWinner(this.state.squares);
-
-        if (winner && winner !== "tie") {
-            status += " Winner is " + winner + " player!";
-        } else if (winner === "tie") {
-            status += "Oh no. It's a tie!!";
+        let status="";
+        const squares = this.state.squares.slice();
+        let turn;
+        if (squares && squares[0] && squares[1] && squares[3] && squares[4]) {
+            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);    
+        }
+        if(turn==="none"){
+            const winner = calculateWinner(this.state.squares);
+            if (winner && winner !== "tie") {
+                status += " Winner is " + winner;
+            } else if (winner === "tie") {
+                status += "Bloody hell. It's a tie!!";
+            }
         }
 
         return (
@@ -82,18 +105,17 @@ class Board extends React.Component {
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
-                    <Score value={this.state.dealer}/>
+                    <Score value={this.state.dealer} />
                 </div>
                 <div className="board-row">
                     {this.renderSquare(3)}
                     {this.renderSquare(4)}
                     {this.renderSquare(5)}
-                    <Score value={this.state.banker}/>
+                    <Score value={this.state.player} />
                 </div>
                 <button onClick={this.reset}>Play Again</button>
             </div>
         );
     }
 }
-
 export default Board;
