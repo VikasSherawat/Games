@@ -12,11 +12,11 @@ export function calculateWinner(squares) {
     return names[winner];
 }
 
-export function getDealerScore(squares){
+function getDealerScore(squares){
     return (extractNumber(squares[0]) + extractNumber(squares[1])+ extractNumber(squares[2])) % 10;
 }
 
-export function getPlayerScore(squares){
+function getPlayerScore(squares){
     return (extractNumber(squares[3]) + extractNumber(squares[4])+ extractNumber(squares[5])) % 10;
 }
 
