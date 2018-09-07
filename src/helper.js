@@ -26,7 +26,7 @@ export function canDrawOneMoreCard(squares, dealer, player){
 
     if (squares && squares[0] && squares[1] && squares[3] && squares[4] && squares[2] && squares[5]) {
         turn= NONE;
-    } else if(dealer>=8 || player>=8){
+    } else if(!squares[5]&&!squares[2] && (dealer>=8 || player>=8)){
         turn= NONE;
     } else if(player <=5 && !(squares[3] && squares[4] && squares[5])){
         turn= "player";
