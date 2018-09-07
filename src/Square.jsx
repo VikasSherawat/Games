@@ -1,5 +1,5 @@
 import React from 'react';
-class Square extends React.Component {
+class Card extends React.Component {
     render(){
         return (
             <img className="square"
@@ -10,5 +10,4 @@ class Square extends React.Component {
           );
     }
 }
-
-export default Square;
+export default Card;

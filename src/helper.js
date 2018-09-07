@@ -1,7 +1,7 @@
 var cardSuitNames = ["clubs", "diamonds", "hearts", "spades"];
 
 export function calculateWinner(squares) {
-    let names = ["tie", "dealer", "player"];
+    let names = ["tie", "Dealer", "Player"];
     
     let dealer = getDealerScore(squares);
     let player = getPlayerScore(squares);

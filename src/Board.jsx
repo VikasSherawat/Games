@@ -1,11 +1,12 @@
 import React from 'react';
-import Square from './Square';
+import Card from './Square';
 import { computeImageName } from './helper';
 import { calculateWinner } from './helper';
 import { pickCard } from './helper';
 import { getScore } from './helper';
 import { canDrawOneMoreCard } from './helper';
 import Score from './Score';
+import { Button } from 'reactstrap';
 
 class Board extends React.Component {
     constructor(props) {
@@ -35,7 +36,7 @@ class Board extends React.Component {
         } else {
             imagePath = `/images/${imageName}.png`;
         }
-        return <Square
+        return <Card
             value={this.state.squares[i]}
             onClick={() => this.handleClick(i)}
             src={imagePath}
@@ -45,18 +46,18 @@ class Board extends React.Component {
     handleClick(index) {
         const squares = this.state.squares.slice();
         let turn;
-        
+
         if (squares[index]) {
             return;
         }
 
         if (squares && squares[0] && squares[1] && squares[3] && squares[4]) {
-            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);    
+            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);
         }
-        if(turn==="none"){
+        if (turn === "none") {
             return;
         }
-        if((index >2 && turn==="dealer")||(index <3 && turn==="player")){
+        if ((index > 2 && turn === "dealer") || (index < 3 && turn === "player")) {
             return
         }
 
@@ -83,13 +84,13 @@ class Board extends React.Component {
     }
 
     render() {
-        let status="";
+        let status = "";
         const squares = this.state.squares.slice();
         let turn;
         if (squares && squares[0] && squares[1] && squares[3] && squares[4]) {
-            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);    
+            turn = canDrawOneMoreCard(squares, this.state.dealer, this.state.player);
         }
-        if(turn==="none"){
+        if (turn === "none") {
             const winner = calculateWinner(this.state.squares);
             if (winner && winner !== "tie") {
                 status += " Winner is " + winner;
@@ -100,20 +101,26 @@ class Board extends React.Component {
 
         return (
             <div>
-                <div className="status">{status}</div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                    <Score value={this.state.dealer} />
-                </div>
                 <div className="board-row">
                     {this.renderSquare(3)}
                     {this.renderSquare(4)}
                     {this.renderSquare(5)}
-                    <Score value={this.state.player} />
                 </div>
-                <button onClick={this.reset}>Play Again</button>
+                <div className="board-row">
+                    {this.renderSquare(0)}
+                    {this.renderSquare(1)}
+                    {this.renderSquare(2)}
+                </div>
+                <div className="scoreSection">
+                    <Score class="score" value={this.state.player} />
+                    <Score class="score" value={this.state.dealer} />
+
+                </div>
+                <div>
+                    <Score class="result" value={status} />
+                    <Button id ="btnReset" color="warning btn-lg" onClick={this.reset}>Play Again!</Button>
+                </div>
+
             </div>
         );
     }
